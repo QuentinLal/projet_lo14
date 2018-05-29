@@ -28,6 +28,7 @@ else
      usage
 fi
 
+    #TO DO: 
   	#Check if the user entered correct arguments (This is done by controller.sh)
   	#check_arguments "$@"
 
