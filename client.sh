@@ -1,16 +1,18 @@
 #!/bin/bash
 
 
-function connect {
+#function connect {
 
-echo "Connecting to the server..."
+#echo "Connecting to the server..."
 #netcat $HOST $PORT
 
-}
+#}
+
+
 
 function execute_command {
 
-    connect "$@"
+  #  connect "$@"
 
 		case $1 in
 			'-list')
@@ -28,16 +30,21 @@ function execute_command {
 
 function request-list {
 
-cat | netcat $HOST $PORT
+echo "You are entering in list mode"
+echo "list" | netcat $HOST $PORT
 
 }
 
 function request-browse {
-echo "list"
+
+echo "You are entering in browse mode"
+echo "browse" | netcat $HOST $PORT
 
 }
 
 function request-extract {
-echo "list"
+
+echo "You are entering in extract mode"
+echo "extract" | netcat $HOST $PORT
 
 }

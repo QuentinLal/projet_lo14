@@ -12,7 +12,7 @@
 source client.sh
 
 function usage {
-echo "usage: $(basename $0) HOST PORT ARCHIVE"
+echo "usage: $(basename $0) OPTION [-list, -browse, -extract] HOST PORT ARCHIVE"
 }
 
 function main {
@@ -21,6 +21,9 @@ if [[ $1 == "-list" || $1 == "-browse" || $1 == "-extract" ]]; then
       HOST=$2
 		  PORT=$3
       ARCHIVE=$4
+
+      #Call client.sh in order to make the request to the server
+      execute_command "$@"
 else
      usage
 fi
@@ -28,8 +31,7 @@ fi
   	#Check if the user entered correct arguments (This is done by controller.sh)
   	#check_arguments "$@"
 
-  	#Call client.sh in order to make the request to the server
-    execute_command "$@"
+
 
 }
 
