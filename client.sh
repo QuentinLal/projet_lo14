@@ -4,7 +4,7 @@
 #function connect {
 
 #echo "Connecting to the server..."
-#netcat $HOST $PORT
+
 
 #}
 
@@ -29,7 +29,7 @@ function execute_command {
 }
 
 function request-list {
-
+echo "[Trying to connect]"
 echo "You are entering in list mode"
 echo "list" | netcat $HOST $PORT
 

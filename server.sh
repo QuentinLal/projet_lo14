@@ -67,7 +67,11 @@ function interaction() {
 
 # These functions implements the differents modes available on the server
 function mode-list () {
-   echo "list"
+  echo "[Connection successfull]"
+  echo "Welcome ! You entered in list-mode"
+  echo "This is the list of the archives stored on the server..."
+  ls archive/
+
 }
 
 function mode-browse() {
@@ -76,6 +80,10 @@ function mode-browse() {
 
 function mode-extract() {
   echo "extract"
+
+
+
+
 }
 
 function mode-error-arg() {
