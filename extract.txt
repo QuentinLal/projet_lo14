@@ -1,0 +1,69 @@
+
+1  ===> On créé l'arboresence des répertoires
+
+On sélectionne les lignes qui indique une arborescence
+
+cat test1.arch | grep "directory [A-Za-z0-9]*/"
+
+Resultat:
+directory Exemple/Test/
+directory Exemple/Test/A
+directory Exemple/Test/A/A1
+directory Exemple/Test/A/A2
+directory Exemple/Test/A/A3
+directory Exemple/Test/B
+
+On supprime directory de chaque ligne...
+
+sed "s/directory //g"
+
+Resultat:
+Exemple/Test/
+Exemple/Test/A
+Exemple/Test/A/A1
+Exemple/Test/A/A2
+Exemple/Test/A/A3
+Exemple/Test/B
+
+On créé maintenant une arborescence:
+
+xargs -I {} mkdir -p "{}" < mydirectories.txt
+
+
+>Au final on éxecute:<
+
+cat test1.arch | grep "directory [A-Za-z0-9]*/" | sed "s/directory //g" > mydirectories.txt
+
+xargs -I {} mkdir -p "{}" < mydirectories.txt
+
+rm -f mydirectories.txt
+
+
+2   ===> Maintenant on va créer chaque fichier avec leurs droits dans les arborescences corresspondantes
+
+ 1) On garde en mémoire le chemin.
+ 2) Pour chaque ligne entre celle du chemin et la ligne @:
+    regarder si les droits commencent par "d" ou "-"
+
+    si les droits commencent par "d", alors le répertoire existe déjà et on lui attribue les droits
+    si les droits commencent par "-", alors c'est un fichier, on le créé avec les droits corresspondants
+
+
+On va utiliser la première ligne des fichiers archives pour sélectionner le contenu intéressant:
+head -n 1 => renvoie [debut contenu intéressant]:[fin contenu intéressant + 1 ligne]
+
+              c'est à dire: "3:25"
+
+BEGINNING=`expr $(head -n 1 test1.arch | sed "s/\([0-9]*\):[0-9]*/\1/g") - 1`
+$BEGINNING=2
+
+ENDING=`expr $(head -n 1 test1.arch | sed "s/[0-9]*:\([0-9]*\)/\1/g") - 1`
+$ENDING=24
+
+On execute:
+head -n $ENDING test1.arch
+
+CORE=`expr $ENDING - $BEGINNING`
+
+
+cat test1.arch | sed "/directory [A-Za-z0-9/]*/d"

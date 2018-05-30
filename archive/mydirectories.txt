@@ -1,0 +1,6 @@
+Exemple/Test/
+Exemple/Test/A
+Exemple/Test/A/A1
+Exemple/Test/A/A2
+Exemple/Test/A/A3
+Exemple/Test/B
