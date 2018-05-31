@@ -48,7 +48,7 @@ function accept-loop() {
 #
 # alors elle invoque la fonction :
 #
-#         commande-CMD arg1 arg2 ... argn
+#         mode-CMD arg1 arg2 ... argn
 #
 # si elle existe; sinon elle envoie une r�ponse d'erreur.
 
@@ -66,12 +66,11 @@ function interaction() {
 }
 
 # These functions implements the differents modes available on the server
-function mode-list () {
+function mode-list() {
   echo "[Connection successfull]"
   echo "Welcome ! You entered in list-mode"
   echo "This is the list of the archives stored on the server..."
   ls archive/
-
 }
 
 function mode-browse() {
@@ -79,8 +78,30 @@ function mode-browse() {
 }
 
 function mode-extract() {
-  echo "extract"
+  echo "[Server] You asked for the extraction of the following archive(s): $args"
 
+  #Path of the archive for which the client asked for an extraction
+  ARCHIVE=archive/$args
+
+  #This will store all the path in the archive in a .txt file
+  cat $ARCHIVE | grep "directory [A-Za-z0-9]*/" | sed "s/directory //g" > mydirectories.txt
+
+  #This will create all the directories from the .txt file
+  xargs -I {} mkdir -p "{}" < mydirectories.txt
+
+
+  BEGINNING=`expr $(head -n 1 $ARCHIVE | sed "s/\([0-9]*\):[0-9]*/\1/g") - 1`
+  ENDING=`expr $(head -n 1 $ARCHIVE | sed "s/[0-9]*:\([0-9]*\)/\1/g") - 1`
+  CORE=`expr $ENDING - $BEGINNING`
+
+  #This select the head of the archive
+  HEAD_OF_THE_ARCHIVE=$(head -n $ENDING $ARCHIVE | tail -n $CORE)
+
+  #We count the number of different path
+  NUMBER_OF_PATH=$(wc -l mydirectories.txt)
+
+
+  
 
 
 

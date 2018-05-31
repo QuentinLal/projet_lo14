@@ -12,15 +12,13 @@
 
 function execute_command {
 
-  #  connect "$@"
-
 		case $1 in
 			'-list')
 				request-list;;
 			'-browse')
 				request-browse;;
 			'-extract')
-				request-extract;;
+				request-extract "$ARCHIVE";;
 			*)
 				echo 'Error'
 				exit 1;;
@@ -44,7 +42,8 @@ echo "browse" | netcat $HOST $PORT
 
 function request-extract {
 
+echo "You want to extract the archive: $ARCHIVE"
 echo "You are entering in extract mode"
-echo "extract" | netcat $HOST $PORT
+echo "extract $ARCHIVE" | netcat $HOST $PORT
 
 }
