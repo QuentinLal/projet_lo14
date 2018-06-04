@@ -107,6 +107,7 @@ NUMBER_OF_PATH=$(wc -l mydirectories.txt)
 ##############################
 
 
+
 Pour i allant de 1 à $NUMBER_OF_PATH
 faire
 
@@ -114,8 +115,10 @@ faire
   PATH=$(head -n 1 mydirectories.txt | sed 's:/:\\/:g')
 
 
-PATH=Exemple\/Test\/
-awk '/$(echo $PATH))$/{flag=1;next}/@/{flag=0}flag' test1.arch
+
+fonctionne:
+
+FILES_AND_DIRS_RIGHTS=$(awk -v THE_PATH='Exemple/Test/$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' test1.arch)
 
 Résultat:
 A drwxr-xr-x 4096
@@ -124,9 +127,7 @@ toto1 -rwxr-xr-x 29 1 3
 toto2 -rw-r--r-- 249 4 10
 
 
-cd Documents/Github/projet_lo14/archive/
-
-RIGHTS=$(awk '/Exemple\/Test\/$/{flag=1;next}/@/{flag=0}flag' test1.arch | cut -f2 -d ' ')
+RIGHTS=$(awk -v THE_PATH='Exemple/Test/$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' test1.arch | cut -f2 -d ' ')
 
 Résultat:
 drwxr-xr-x

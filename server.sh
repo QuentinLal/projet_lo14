@@ -94,14 +94,46 @@ function mode-extract() {
   ENDING=`expr $(head -n 1 $ARCHIVE | sed "s/[0-9]*:\([0-9]*\)/\1/g") - 1`
   CORE=`expr $ENDING - $BEGINNING`
 
-  #This select the head of the archive
+  #This select the head of the archive (Path, files and dir names and their rights)
   HEAD_OF_THE_ARCHIVE=$(head -n $ENDING $ARCHIVE | tail -n $CORE)
 
   #We count the number of different path
   NUMBER_OF_PATH=$(wc -l mydirectories.txt)
 
 
-  
+  #Loop through the paths of the file mydirectories.txt
+  #We introduce the var I, that we will use for the command head -n$I
+  I=1
+  while read one_of_the_paths; do
+
+    THE_PATH=$one_of_the_paths
+    FILES_AND_DIRS_RIGHTS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' test1.arch)
+    RIGHTS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' $ARCHIVE | cut -f2 -d ' ')
+    FILES_AND_DIRS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' $ARCHIVE | cut -f1 -d ' ')
+
+    #Here we are applying a treatment over $FILES_AND_DIRS_RIGHTS:
+    #A drwxr-xr-x 4096
+    #B drwxr-xr-x 4096
+    #toto1 -rwxr-xr-x 29 1 3
+    #toto2 -rw-r--r-- 249 4 10
+
+    for lines in $FILES_AND_DIRS_RIGHTS
+    do
+      if [[ $rights == d* ]]; then
+
+        chmod u=$USER_RIGHTS,g=GROUP_RIGHTS,o=OTHER_RIGHTS $PATH/$NAME
+
+      else
+        touch $PATH/$FILE_NAME
+        chmod u=$USER_RIGHTS,g=GROUP_RIGHTS,o=OTHER_RIGHTS $PATH/$NAME
+      fi
+    done
+
+
+  done <mydirectories.txt
+
+
+
 
 
 
