@@ -90,26 +90,17 @@ function mode-extract() {
   xargs -I {} mkdir -p "{}" < mydirectories.txt
 
 
-  BEGINNING=`expr $(head -n 1 $ARCHIVE | sed "s/\([0-9]*\):[0-9]*/\1/g") - 1`
-  ENDING=`expr $(head -n 1 $ARCHIVE | sed "s/[0-9]*:\([0-9]*\)/\1/g") - 1`
-  CORE=`expr $ENDING - $BEGINNING`
-
-  #This select the head of the archive (Path, files and dir names and their rights)
-  HEAD_OF_THE_ARCHIVE=$(head -n $ENDING $ARCHIVE | tail -n $CORE)
-
-  #We count the number of different path
-  NUMBER_OF_PATH=$(wc -l mydirectories.txt)
-
-
   #Loop through the paths of the file mydirectories.txt
-  #We introduce the var I, that we will use for the command head -n$I
-  I=1
   while read one_of_the_paths; do
 
     THE_PATH=$one_of_the_paths
-    FILES_AND_DIRS_RIGHTS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' test1.arch)
-    RIGHTS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' $ARCHIVE | cut -f2 -d ' ')
-    FILES_AND_DIRS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' $ARCHIVE | cut -f1 -d ' ')
+    FILES_AND_DIRS_RIGHTS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' $ARCHIVE)
+    RIGHTS=$(echo "$FILES_AND_DIRS_RIGHTS" | cut -f2 -d ' ')
+    FILES_AND_DIRS=$(echo "$FILES_AND_DIRS_RIGHTS" | cut -f1 -d ' ')
+
+    echo "$FILES_AND_DIRS_RIGHTS" > temporary_files/FILES_AND_DIRS_RIGHTS.txt
+    echo "$RIGHTS" > temporary_files/RIGHTS.txt
+    echo "$FILES_AND_DIRS" > temporary_files/FILES_AND_DIRS.txt
 
     #Here we are applying a treatment over $FILES_AND_DIRS_RIGHTS:
     #A drwxr-xr-x 4096
@@ -117,25 +108,71 @@ function mode-extract() {
     #toto1 -rwxr-xr-x 29 1 3
     #toto2 -rw-r--r-- 249 4 10
 
-    for lines in $FILES_AND_DIRS_RIGHTS
-    do
-      if [[ $rights == d* ]]; then
+    #We introduce the var I, that we will use for the command sed -n $I'p'
+    I=1
+    while read lines; do
 
-        chmod u=$USER_RIGHTS,g=GROUP_RIGHTS,o=OTHER_RIGHTS $PATH/$NAME
+    rights=$(cat temporary_files/RIGHTS.txt | sed -n $I'p')
+    files_and_dirs=$(cat temporary_files/FILES_AND_DIRS.txt | sed -n $I'p')
+    user_rights_1=$(echo $rights | cut -c2)
+    user_rights_2=$(echo $rights | cut -c3)
+    user_rights_3=$(echo $rights | cut -c4)
+    group_rights_1=$(echo $rights | cut -c5)
+    group_rights_2=$(echo $rights | cut -c6)
+    group_rights_3=$(echo $rights | cut -c7)
+    other_rights_1=$(echo $rights | cut -c8)
+    other_rights_2=$(echo $rights | cut -c9)
+    other_rights_3=$(echo $rights | cut -c10)
 
-      else
-        touch $PATH/$FILE_NAME
-        chmod u=$USER_RIGHTS,g=GROUP_RIGHTS,o=OTHER_RIGHTS $PATH/$NAME
-      fi
-    done
+
+    #Si la première lettre de la ligne 'I' de "RIGHTS.txt" commence par "d" alors, c'est un répertoire auquel on attribue les droits
+    if [[ $rights == d* ]]; then
+       echo "------------------"
+       echo "Oh un répertoire !"
+       echo "On va lui attribuer les droits suivant: "
+
+       chmod u+$user_rights_1 $THE_PATH'/'$files_and_dirs
+       chmod u+$user_rights_2 $THE_PATH'/'$files_and_dirs
+       chmod u+$user_rights_3 $THE_PATH'/'$files_and_dirs
+
+       chmod g+$group_rights_1 $THE_PATH'/'$files_and_dirs
+       chmod g+$group_rights_2 $THE_PATH'/'$files_and_dirs
+       chmod g+$group_rights_3 $THE_PATH'/'$files_and_dirs
+
+       chmod o+$other_rights_1 $THE_PATH'/'$files_and_dirs
+       chmod o+$other_rights_2 $THE_PATH'/'$files_and_dirs
+       chmod o+$other_rights_3 $THE_PATH'/'$files_and_dirs
+
+    #Si la première lettre de la ligne 'I' de "RIGHTS.txt" commence par "-" alors, c'est un répertoire auquel on attribue les droits
+    elif [[ $rights  == -* ]]; then
+       echo "------------------"
+       echo "Oh un fichier !"
+       echo "On va le créer et lui attribuer les droits: "
+
+       touch $THE_PATH'/'$files_and_dirs
+
+       chmod u+$user_rights_1 $THE_PATH'/'$files_and_dirs
+       chmod u+$user_rights_2 $THE_PATH'/'$files_and_dirs
+       chmod u+$user_rights_3 $THE_PATH'/'$files_and_dirs
+
+       chmod g+$group_rights_1 $THE_PATH'/'$files_and_dirs
+       chmod g+$group_rights_2 $THE_PATH'/'$files_and_dirs
+       chmod g+$group_rights_3 $THE_PATH'/'$files_and_dirs
+
+       chmod o+$other_rights_1 $THE_PATH'/'$files_and_dirs
+       chmod o+$other_rights_2 $THE_PATH'/'$files_and_dirs
+       chmod o+$other_rights_3 $THE_PATH'/'$files_and_dirs
+     fi
+    let "I++"
+
+    done <temporary_files/FILES_AND_DIRS_RIGHTS.txt
 
 
   done <mydirectories.txt
 
-
-
-
-
+#Cleaning...
+rm -f mydirectories.txt
+rm -rf temporary_files/*
 
 }
 
