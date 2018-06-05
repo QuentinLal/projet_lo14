@@ -114,12 +114,15 @@ function mode-extract() {
 
     rights=$(cat temporary_files/RIGHTS.txt | sed -n $I'p')
     files_and_dirs=$(cat temporary_files/FILES_AND_DIRS.txt | sed -n $I'p')
+
     user_rights_1=$(echo $rights | cut -c2)
     user_rights_2=$(echo $rights | cut -c3)
     user_rights_3=$(echo $rights | cut -c4)
+
     group_rights_1=$(echo $rights | cut -c5)
     group_rights_2=$(echo $rights | cut -c6)
     group_rights_3=$(echo $rights | cut -c7)
+    
     other_rights_1=$(echo $rights | cut -c8)
     other_rights_2=$(echo $rights | cut -c9)
     other_rights_3=$(echo $rights | cut -c10)
