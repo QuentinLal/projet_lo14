@@ -94,6 +94,7 @@ function mode-extract() {
   while read one_of_the_paths; do
 
     THE_PATH=$one_of_the_paths
+
     FILES_AND_DIRS_RIGHTS=$(awk -v THE_PATH=$THE_PATH'$' '$0~THE_PATH{flag=1;next}/@/{flag=0} flag' $ARCHIVE)
     RIGHTS=$(echo "$FILES_AND_DIRS_RIGHTS" | cut -f2 -d ' ')
     FILES_AND_DIRS=$(echo "$FILES_AND_DIRS_RIGHTS" | cut -f1 -d ' ')
@@ -101,12 +102,6 @@ function mode-extract() {
     echo "$FILES_AND_DIRS_RIGHTS" > temporary_files/FILES_AND_DIRS_RIGHTS.txt
     echo "$RIGHTS" > temporary_files/RIGHTS.txt
     echo "$FILES_AND_DIRS" > temporary_files/FILES_AND_DIRS.txt
-
-    #Here we are applying a treatment over $FILES_AND_DIRS_RIGHTS:
-    #A drwxr-xr-x 4096
-    #B drwxr-xr-x 4096
-    #toto1 -rwxr-xr-x 29 1 3
-    #toto2 -rw-r--r-- 249 4 10
 
     #We introduce the var I, that we will use for the command sed -n $I'p'
     I=1
@@ -122,7 +117,7 @@ function mode-extract() {
     group_rights_1=$(echo $rights | cut -c5)
     group_rights_2=$(echo $rights | cut -c6)
     group_rights_3=$(echo $rights | cut -c7)
-    
+
     other_rights_1=$(echo $rights | cut -c8)
     other_rights_2=$(echo $rights | cut -c9)
     other_rights_3=$(echo $rights | cut -c10)
@@ -131,8 +126,8 @@ function mode-extract() {
     #Si la première lettre de la ligne 'I' de "RIGHTS.txt" commence par "d" alors, c'est un répertoire auquel on attribue les droits
     if [[ $rights == d* ]]; then
        echo "------------------"
-       echo "Oh un répertoire !"
-       echo "On va lui attribuer les droits suivant: "
+       echo "The server found a directory located in $THE_PATH/$files_and_dirs"
+       echo "Adding the rights $rights to it..."
 
        chmod u+$user_rights_1 $THE_PATH'/'$files_and_dirs
        chmod u+$user_rights_2 $THE_PATH'/'$files_and_dirs
@@ -149,8 +144,8 @@ function mode-extract() {
     #Si la première lettre de la ligne 'I' de "RIGHTS.txt" commence par "-" alors, c'est un répertoire auquel on attribue les droits
     elif [[ $rights  == -* ]]; then
        echo "------------------"
-       echo "Oh un fichier !"
-       echo "On va le créer et lui attribuer les droits: "
+       echo "The server found a file located in $THE_PATH/$files_and_dirs"
+       echo "Adding the rights $rights to it..."
 
        touch $THE_PATH'/'$files_and_dirs
 
