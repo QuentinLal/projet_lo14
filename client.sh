@@ -7,9 +7,6 @@
 
 
 #}
-
-
-
 function execute_command {
 
 		case $1 in
@@ -27,21 +24,18 @@ function execute_command {
 }
 
 function request-list {
-echo "[Trying to connect]"
 echo "You are entering in list mode"
 echo "list" | netcat $HOST $PORT
 
 }
 
 function request-browse {
-
-echo "You are entering in browse mode"
-echo "browse" | netcat $HOST $PORT
+echo "You are entering in browse mode ['pwd';'cat';'cd';'ls';'rm']"
+ncat $HOST $PORT
 
 }
 
 function request-extract {
-
 echo "You want to extract the archive: $ARCHIVE"
 echo "You are entering in extract mode"
 echo "extract $ARCHIVE" | netcat $HOST $PORT
