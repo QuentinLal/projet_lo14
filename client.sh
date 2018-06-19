@@ -4,10 +4,10 @@ function execute_command {
 		case $1 in
 			'-list')
 				request-list;;
-			'-browse')
-				request-browse "$ARCHIVE";;
 			'-extract')
 				request-extract "$ARCHIVE";;
+			'-browse')
+				request-browse "$ARCHIVE";;
 			*)
 				echo 'Error'
 				exit 1;;
@@ -16,16 +16,31 @@ function execute_command {
 }
 
 function request-list {
-echo "You asked to list all the archives on the server"
-echo "list" | netcat $HOST $PORT
-}
-
-function request-browse {
-echo "You asked to browse the following archive: $ARCHIVE"
-echo "browse $ARCHIVE" | netcat $HOST $PORT
+if echo "list" | netcat $HOST $PORT; then
+	echo "You asked to list all the archives on the server"
+else
+	echo "The server can not be reached."
+fi
 }
 
 function request-extract {
-echo "You asked to extract the following archive: $ARCHIVE"
-echo "extract $ARCHIVE" | netcat $HOST $PORT
+if echo "extract $ARCHIVE" | netcat $HOST $PORT; then
+	echo "You asked to extract the following archive: $ARCHIVE"
+else
+	echo "The server can not be reached."
+fi
+}
+
+function request-browse {
+
+echo "You asked to browse the following archive: $ARCHIVE"
+echo "Availables commands: [pwd, cat filename, cd dirname, ls file/dirname, rm file/dirname, clear, man, exit]"
+
+local cmd arg
+while true; do
+	echo "vsh:>"
+	read cmd arg || exit -1
+	echo "$cmd $arg $ARCHIVE" | netcat $HOST $PORT
+done
+
 }

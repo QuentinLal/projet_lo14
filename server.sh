@@ -17,6 +17,7 @@ fi
 
 PORT="$1"
 CURRENT="Exemple/Test/"
+
 # The pipe
 FIFO="/tmp/$USER-fifo-$$"
 
@@ -52,9 +53,10 @@ function accept-loop() {
 #
 # si elle existe; sinon elle envoie une r�ponse d'erreur.
 function interaction() {
-    local cmd args
+    local cmd args arch
     while true; do
-	read cmd args || exit -1
+	read cmd args arch || exit -1
+
 	fun="mode-$cmd"
 
 	if [ "$(type -t $fun)" = "function" ]; then
@@ -63,7 +65,10 @@ function interaction() {
       exit 0
     else
       #We are in browse mode
-      $fun $args
+      #arg1 is the archive which is always sent by the client
+      echo "Execution en mode browse..."
+      $fun $args $arch
+      exit 0
     fi
 	else
 	    mode-error-arg $fun $args
@@ -176,22 +181,22 @@ rm -rf temporary_files/*
 }
 
 
-function mode-archive_to_browse() {
-ARCHIVE=archive/$args
-}
-
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function  mode-pwd()
 {
-  if [ $# -eq 0 ]; then
-      echo "$CURRENT/"
-  else
-      echo "No Argument required (use man)"
-  fi
+echo "$CURRENT"
 }
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function mode-cat()
 {
+  #Debug
+  echo "Le cat est lancé"
+  ARCHIVE=archive/$arch
+  echo $ARCHIVE
+  echo $args
+
+  #Pourquoi ça met "File not found"pas alors que ARCHIVE=archive/test1.arch et args = toto1 ..?
+  
   grep '^directory' $ARCHIVE | sed 's/directory //g' > dir.txt                         #On recup header
   if [ $# -eq 0 ]; then
       echo "We need a file in Argument (use man)"
@@ -288,6 +293,12 @@ function mode-cd()
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function mode-ls()
 {
+
+  #Debug
+  echo "coucou"
+  echo $args
+  echo $arch
+  ARCHIVE=archive/$args
 
   grep '^directory' $ARCHIVE | sed 's/directory //g' > dir.txt                         #On recup header
   if [ $# -eq 0 ]; then
