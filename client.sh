@@ -1,12 +1,4 @@
 #!/bin/bash
-
-
-#function connect {
-
-#echo "Connecting to the server..."
-
-
-#}
 function execute_command {
 
 		case $1 in
@@ -24,19 +16,16 @@ function execute_command {
 }
 
 function request-list {
-echo "You are entering in list mode"
+echo "You asked to list all the archives on the server"
 echo "list" | netcat $HOST $PORT
-
 }
 
 function request-browse {
-echo "ls $ARCHIVE" | nc $HOST $PORT
-
+echo "You asked to browse the following archive: $ARCHIVE"
+echo "browse $ARCHIVE" | netcat $HOST $PORT
 }
 
 function request-extract {
-echo "You want to extract the archive: $ARCHIVE"
-echo "You are entering in extract mode"
+echo "You asked to extract the following archive: $ARCHIVE"
 echo "extract $ARCHIVE" | netcat $HOST $PORT
-
 }

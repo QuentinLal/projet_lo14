@@ -44,11 +44,7 @@ elif [[ $1 == "-extract" || $1 == "-browse"  ]]; then
       PORT=$3
       ARCHIVE=$4
 
-      if [[ $3 -eq 0 || $4 -eq 0 ]];then
-
-        usage
-
-      elif [[ $HOST =~ $ValidIpAddressRegex || $HOST =~ $ValidHostnameRegex  && $PORT =~ $ValidPortRegex && $ARCHIVE != .arch$ ]]; then
+      if [[ $HOST =~ $ValidIpAddressRegex || $HOST =~ $ValidHostnameRegex  && $PORT =~ $ValidPortRegex && $ARCHIVE == *.arch ]]; then
 
         #Call client.sh in order to make the request to the server
         execute_command "$@"

@@ -62,7 +62,7 @@ function interaction() {
 	    $fun $args
       exit 0
     else
-      #If it is a browse...
+      #We are in browse mode
       $fun $args
     fi
 	else
@@ -70,6 +70,7 @@ function interaction() {
 	fi
     done
 }
+
 # These functions implements the differents modes available on the server
 function mode-list() {
   echo "[Connection successfull]"
@@ -174,39 +175,13 @@ rm -f mydirectories.txt
 rm -rf temporary_files/*
 }
 
-function mode-browse() {
-  PS3='Available commands ['pwd';'cat';'cd';'ls';'rm']'
-  options=("pwd" "cat" "cd" "ls" "rm")
-  select opt in "${options[@]}"
-  do
-      case $opt in
-          "pwd")
-              echo "pwd"
-              ;;
-          "cat")
-              echo "cat"
-              ;;
-          "cd")
-              echo "cd"
-              ;;
-          "ls")
-              echo "ls"
-              ;;
-          "rm")
-              echo "rm"
-              ;;
-          "exit")
-              break
-              ;;
-              *) echo invalid option;;
-            esac
-  done
+
+function mode-archive_to_browse() {
+ARCHIVE=archive/$args
 }
 
-
-
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
-function mode-pwd()
+function  mode-pwd()
 {
   if [ $# -eq 0 ]; then
       echo "$CURRENT/"
@@ -221,7 +196,7 @@ function mode-cat()
   if [ $# -eq 0 ]; then
       echo "We need a file in Argument (use man)"
   elif [ $# -eq 1 ]; then
-      VAR=$1
+      VAR=$args
   fi
   touch /tmp/target.txt
   ligne=$(grep -n '^directory '$CURRENT'' $ARCHIVE | head -1 | cut -d: -f1)            #On recup num de ligne du répertoire actuel
