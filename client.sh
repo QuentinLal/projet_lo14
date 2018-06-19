@@ -14,7 +14,7 @@ function execute_command {
 		esac
 
 }
-
+#request the server to list its archives
 function request-list {
 if echo "list" | netcat $HOST $PORT; then
 	echo "You asked to list all the archives on the server"
@@ -22,7 +22,7 @@ else
 	echo "The server can not be reached."
 fi
 }
-
+#request the server to extract a specified archive
 function request-extract {
 if echo "extract $ARCHIVE" | netcat $HOST $PORT; then
 	echo "You asked to extract the following archive: $ARCHIVE"
@@ -30,7 +30,7 @@ else
 	echo "The server can not be reached."
 fi
 }
-
+#Enter in browse mode in order to make multiple requests
 function request-browse {
 
 echo "You asked to browse the following archive: $ARCHIVE"
@@ -42,5 +42,4 @@ while true; do
 	read cmd arg || exit -1
 	echo "$cmd $arg $ARCHIVE" | netcat $HOST $PORT
 done
-
 }

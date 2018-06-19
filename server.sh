@@ -1,14 +1,6 @@
 #! /bin/bash
 
-####################
-#
-#	SERVER
-#	Description :
-#
-#
-#
-####################
-
+#Check if the user had entered a port when launching the script
 if [ $# -ne 1 ]; then
     echo "/!\ You have to specify a port /!\ "
     echo "usage: $(basename $0) PORT"
@@ -16,25 +8,17 @@ if [ $# -ne 1 ]; then
 fi
 
 PORT="$1"
-CURRENT="Exemple/Test/"
-
+CURRENT="Exemple/Test"
 # The pipe
 FIFO="/tmp/$USER-fifo-$$"
 
-# When the connection ends, we kill the pipe in order to keep clean the
-# /tmp. directory. We use the instruction "trap" in order to be sure to clean it
-# even if the server is interrupted by any signal.
-#function cleaner() {
-#  pipes_to_kill=$(ls /tmp/ | grep "$USER-fifo" | xargs -L1 rm -f)
-#}
-
-
-function nettoyage() { rm -f "$FIFO"; }
-trap nettoyage EXIT
+#Clean the folder where pipes are stored
+function cleaner() { rm -f "$FIFO"; }
+trap cleaner EXIT
 # We create the pipe
 [ -e "$FIFO" ] || mkfifo "$FIFO"
 
-
+#Listen requests on the specified port
 function accept-loop() {
   echo "The server is now listening on the port $PORT"
     while true; do
@@ -42,16 +26,8 @@ function accept-loop() {
     done
 }
 
-# La fonction interaction lit les commandes du client sur entrée standard
-# et envoie les r�ponses sur sa sortie standard.
-#
-# 	CMD arg1 arg2 ... argn
-#
-# alors elle invoque la fonction :
-#
-#         mode-CMD arg1 arg2 ... argn
-#
-# si elle existe; sinon elle envoie une r�ponse d'erreur.
+#This function reads the command written on its standard input
+#and disply the result of the command on its standard output
 function interaction() {
     local cmd args arch
     while true; do
@@ -76,14 +52,17 @@ function interaction() {
     done
 }
 
+#------------------------
 # These functions implements the differents modes available on the server
+#------------------------
+
+#List all the archives on the server
 function mode-list() {
-  echo "[Connection successfull]"
-  echo "Welcome ! You entered in list-mode"
-  echo "This is the list of the archives stored on the server..."
+  echo "[Server] This is the list of the archives stored on the server..."
   ls archive/
 }
 
+#Extract a specified archive
 function mode-extract() {
   echo "[Server] You asked for the extraction of the following archive(s): $args"
 
@@ -130,7 +109,7 @@ function mode-extract() {
     other_rights_3=$(echo $rights | cut -c10)
 
 
-    #Si la première lettre de la ligne 'I' de "RIGHTS.txt" commence par "d" alors, c'est un répertoire auquel on attribue les droits
+    #If the first letter of the line 'I' of "RIGHTS.txt" begins by "d" then, it's a directory and we add its rights
     if [[ $rights == d* ]]; then
        echo "------------------"
        echo "The server found a directory located in $THE_PATH/$files_and_dirs"
@@ -148,7 +127,7 @@ function mode-extract() {
        chmod o+$other_rights_2 $THE_PATH'/'$files_and_dirs
        chmod o+$other_rights_3 $THE_PATH'/'$files_and_dirs
 
-    #Si la première lettre de la ligne 'I' de "RIGHTS.txt" commence par "-" alors, c'est un répertoire auquel on attribue les droits
+    #If the first letter of the line 'I' of "RIGHTS.txt" begins by "-" then, it's a file and we add its rights
     elif [[ $rights  == -* ]]; then
        echo "------------------"
        echo "The server found a file located in $THE_PATH/$files_and_dirs"
@@ -180,7 +159,6 @@ rm -f mydirectories.txt
 rm -rf temporary_files/*
 }
 
-
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function  mode-pwd()
 {
@@ -194,9 +172,10 @@ function mode-cat()
   ARCHIVE=archive/$arch
   echo $ARCHIVE
   echo $args
+  echo $CURRENT
 
-  #Pourquoi ça met "File not found"pas alors que ARCHIVE=archive/test1.arch et args = toto1 ..?
-  
+  #Pourquoi ça met "File not found" alors que ARCHIVE=archive/test1.arch et args = toto1 ..?
+
   grep '^directory' $ARCHIVE | sed 's/directory //g' > dir.txt                         #On recup header
   if [ $# -eq 0 ]; then
       echo "We need a file in Argument (use man)"
@@ -263,7 +242,7 @@ function mode-cd()
               FOLDER=$(echo "$CURRENT" | sed -e 's/^\(.*\/\)[^\/]*/\1/')
               FOLDER=$(echo "$FOLDER" | sed -e 's/[/]$//g')
           fi
-      elif [ "$VAR" = "/" ]; then                                                      #Si cd /
+      elif [ "$VAR" = "/" ]; then                                                      #If cd /
           CURRENT="Exemple/Test/"
           Flagfinnish="1"
           echo "$CURRENT"
@@ -501,8 +480,6 @@ function mode-man() {
   fi
 }
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 function mode-error-arg() {
   echo "Error-arg: The server can not treat your request"
 }
