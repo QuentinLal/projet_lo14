@@ -30,8 +30,7 @@ echo "list" | netcat $HOST $PORT
 }
 
 function request-browse {
-echo "You are entering in browse mode ['pwd';'cat';'cd';'ls';'rm']"
-nc $HOST $PORT
+echo "ls $ARCHIVE" | nc $HOST $PORT
 
 }
 

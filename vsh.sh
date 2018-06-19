@@ -21,7 +21,7 @@ ValidIpAddressRegex="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0
 ValidHostnameRegex="^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
 ValidPortRegex="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
 
-if [[ $1 == "-list" || $1 == "-browse" ]]; then
+if [[ $1 == "-list" ]]; then
 
       HOST=$2
 		  PORT=$3
@@ -38,13 +38,17 @@ if [[ $1 == "-list" || $1 == "-browse" ]]; then
       fi
 
 
-elif [[ $1 == "-extract" ]]; then
+elif [[ $1 == "-extract" || $1 == "-browse"  ]]; then
 
       HOST=$2
       PORT=$3
       ARCHIVE=$4
 
-      if [[ $HOST =~ $ValidIpAddressRegex || $HOST =~ $ValidHostnameRegex  && $PORT =~ $ValidPortRegex && $ARCHIVE != .arch$ ]]; then
+      if [[ $3 -eq 0 || $4 -eq 0 ]];then
+
+        usage
+
+      elif [[ $HOST =~ $ValidIpAddressRegex || $HOST =~ $ValidHostnameRegex  && $PORT =~ $ValidPortRegex && $ARCHIVE != .arch$ ]]; then
 
         #Call client.sh in order to make the request to the server
         execute_command "$@"
