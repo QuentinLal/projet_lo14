@@ -13,7 +13,7 @@ function execute_command {
 			'-list')
 				request-list;;
 			'-browse')
-				request-browse;;
+				request-browse "$ARCHIVE";;
 			'-extract')
 				request-extract "$ARCHIVE";;
 			*)
@@ -31,7 +31,7 @@ echo "list" | netcat $HOST $PORT
 
 function request-browse {
 echo "You are entering in browse mode ['pwd';'cat';'cd';'ls';'rm']"
-ncat $HOST $PORT
+nc $HOST $PORT
 
 }
 
